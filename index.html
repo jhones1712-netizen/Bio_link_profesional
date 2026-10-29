@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>John Esteban Sepúlveda</title>
+<style>
+  :root {
+    --crema: #F5F0E6;
+    --tinta: #2C2A27;
+    --mostaza: #E8A92B;
+    --naranja: #C4461F;
+    --papel: #FFFFFF;
+    --cafe: #8B5A2B;
+    --gris: #6B665E;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--crema);
+    color: var(--tinta);
+    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+  main { width: 100%; max-width: 420px; padding: 32px 22px 40px; text-align: center; }
+  .perfil {
+    width: 96px; height: 96px; margin: 0 auto 18px;
+    border-radius: 50%; background: var(--mostaza);
+    display: grid; place-items: center;
+    font-size: 40px; font-weight: 700;
+  }
+  h1 {
+    margin: 0 0 14px; padding: 10px 14px;
+    background: var(--tinta); color: #fff;
+    font-size: 22px; font-weight: 700; letter-spacing: 0.2px;
+  }
+  .frase { margin: 0; font-size: 18px; line-height: 1.45; }
+  .divisor { display: block; width: 100%; height: 40px; margin: 14px 0 10px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { margin-bottom: 14px; }
+  .boton {
+    display: block; width: 100%; padding: 16px 12px;
+    background: var(--naranja); color: #fff;
+    text-decoration: none; font-size: 18px; font-weight: 700;
+    border: 0; border-radius: 4px;
+  }
+  li:nth-child(odd) .boton { transform: rotate(-0.6deg); }
+  li:nth-child(even) .boton { transform: rotate(0.6deg); }
+  a.boton:active { transform: translateY(2px); }
+  a.boton:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+  .boton.invalido { background: #CFC8BB; color: #4A453E; cursor: not-allowed; }
+  .nota { display: block; margin-top: 6px; font-size: 14px; color: var(--gris); }
+  .reporte {
+    margin-top: 26px; padding: 16px;
+    background: var(--papel); border: 2px solid var(--tinta);
+  }
+  .reporte p { margin: 4px 0; font-size: 17px; }
+  .reporte strong { font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <div class="perfil" aria-hidden="true">J</div>
+  <h1>John Esteban Sepúlveda</h1>
+  <p class="frase">Yo soy el Arco que se estira para impulsar mis sueños</p>
+
+  <svg class="divisor" viewBox="0 0 300 40" role="img" aria-label="Un arco que lanza una flecha">
+    <path d="M52 5 Q22 20 52 35" fill="none" stroke="#8B5A2B" stroke-width="4" stroke-linecap="round"/>
+    <line x1="52" y1="5" x2="52" y2="35" stroke="#6B665E" stroke-width="1"/>
+    <line x1="52" y1="20" x2="250" y2="20" stroke="#8B5A2B" stroke-width="3"/>
+    <polygon points="250,13 268,20 250,27" fill="#C4461F"/>
+    <line x1="58" y1="20" x2="68" y2="12" stroke="#2E7D6B" stroke-width="3"/>
+    <line x1="58" y1="20" x2="68" y2="28" stroke="#2E7D6B" stroke-width="3"/>
+  </svg>
+
+  <ul id="lista"></ul>
+
+  <section class="reporte" aria-live="polite">
+    <p>Total de clics: <strong id="total">0</strong></p>
+    <p>Enlace más usado: <strong id="masUsado">—</strong></p>
+  </section>
+</main>
+
+<script>
+  // LISTA DE ENLACES: cada enlace tiene nombre, URL y clics.
+  const enlaces = [
+    { nombre: "Plataforma logística", nota: "Mi plataforma de despachos",
+      url: "https://jhones1712-netizen.github.io/Plataforma_de_Gesti-n_Log-stica_y_Despachos/", clics: 0 },
+    { nombre: "GitHub", nota: "Mi perfil de código",
+      url: "https://github.com/jhones1712-netizen", clics: 0 },
+    { nombre: "LinkedIn", nota: "Mi perfil profesional",
+      url: "https://www.linkedin.com/in/john-esteban-sepulveda-vargas-b760a2204/", clics: 0 },
+    { nombre: "Portafolio", nota: "Mi portafolio con asistente de IA",
+      url: "https://jhones1712-netizen.github.io/Portafolio-con-asistente-de-IA/", clics: 0 }
+  ];
+
+  // ACUMULADOR: aquí se suma cada clic válido.
+  let totalClics = 0;
+
+  const lista = document.getElementById("lista");
+  const totalEl = document.getElementById("total");
+  const masUsadoEl = document.getElementById("masUsado");
+
+  // VALIDACIÓN: la URL es válida solo si empieza por https://
+  function esValida(url) {
+    return url.toLowerCase().startsWith("https://");
+  }
+
+  function actualizarReporte() {
+    totalEl.textContent = totalClics;
+    let mejor = null;
+    for (const e of enlaces) {
+      if (e.clics > 0 && (mejor === null || e.clics > mejor.clics)) mejor = e;
+    }
+    masUsadoEl.textContent = mejor ? mejor.nombre + " (" + mejor.clics + ")" : "—";
+  }
+
+  function crearItem(enlace) {
+    const li = document.createElement("li");
+    let boton;
+    if (esValida(enlace.url)) {
+      boton = document.createElement("a");
+      boton.href = enlace.url;
+      boton.target = "_blank";
+      boton.rel = "noopener noreferrer";
+      boton.textContent = enlace.nombre;
+      boton.addEventListener("click", () => {
+        enlace.clics += 1;
+        totalClics += 1;
+        actualizarReporte();
+      });
+    } else {
+      boton = document.createElement("span");
+      boton.setAttribute("aria-disabled", "true");
+      boton.textContent = "Enlace inválido";
+      boton.classList.add("invalido");
+    }
+    boton.classList.add("boton");
+    li.appendChild(boton);
+
+    const nota = document.createElement("small");
+    nota.className = "nota";
+    nota.textContent = enlace.nota;
+    li.appendChild(nota);
+    return li;
+  }
+
+  enlaces.forEach(e => lista.appendChild(crearItem(e)));
+  actualizarReporte();
+</script>
+</body>
+</html>
